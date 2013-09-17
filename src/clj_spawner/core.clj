@@ -1,8 +1,8 @@
-(ns clj-spawner.core)
+(ns clj-spawner.core
   (:require [clojure.java.io   :as io]
             [clj-spawner.utils :as utils]))
 
-(defn -wrap [process]
+(defn- wrap [process]
   {:out-stream  (.getOutputStream process)
    :err-stream  (.getErrorStream  process)
    :in-stream   (.getInputStream  process)
@@ -11,7 +11,7 @@
                      (.exitValue process))
    :wait       #(.waitFor process)})
 
-(defn -wrap-streams [process-map]
+(defn- wrap-streams [process-map]
   (merge process-map
          {:read-output #( slurp (io/reader (:in-stream  process-map)))
           :read-error  #( slurp (io/reader (:err-stream process-map)))}))
@@ -21,7 +21,7 @@
         process (.exec runtime command)]
 
     (.addShutdownHook runtime (Thread. #(.destroy process)))
-    (-> process -wrap -wrap-streams)))
+    (-> process wrap wrap-streams)))
 
 (defn exec-with-callbacks
   [command & {:keys [success error timeout]
