@@ -6,8 +6,20 @@ Utilities for shelling out in Clojure
 - Timeout
 - Easy access to IO streams
 
+## Process Wrapper
+clj-spawner wraps the Java process object with this map structure
+- `:read-error`  - function - call it to read process STDERR output
+- `:read-output` - function - call it to read process STDOUT output
+- `:kill`        - function - call it to kill the process
+- `:exit`        - function - wait for process to complete and returns the exit code
+- `:wait`        - function - wait for process to complete
+- `:out-stream`  - returns the STDOUT stream object
+- `:err-stream`  - returns the STDERR stream object
+- `:in-stream`   - returns the STDIN  stream object
+- `:exception`   - when exception occur this field will hold the exception instance
+
 ## Usage
-Shelling out
+shelling out using `exec` which returns a map that wraps the spawned process
 
 ```clojure
 (require '[clj-spawner.core :as spawner])
@@ -33,12 +45,19 @@ Shelling out
 ((:exit (spawner/exec "cat no-such-file")))
 ;=> 1
 ```
-Future
+shelling out using `exec-with-callbacks` which returns a future object
 ```clojure
 (clj-spawner.core/exec-with-callbacks "echo hello")
 ;=> returns a future object
+
+@(clj-spawner.core/exec-with-callbacks "sleep 10")
+;returns the process map after 10 seconds
+
+((:read-output @(clj-spawner.core/exec-with-callbacks "echo hello")))
+;=> "hello\n"
 ```
-Passing error & success callbacks
+
+passing error & success callbacks
 ```clojure
 (clj-spawner.core/exec-with-callbacks "echo hello" 
   :success #(println (str "HI THIS IS FUN " %1))
@@ -47,7 +66,7 @@ Passing error & success callbacks
 ;=> HI THIS IS FUN {:read-output...}
 ```
 
-Errors (exit codes != 0)
+errors (exit codes != 0)
 ```clojure
 (clj-spawner.core/exec-with-callbacks "cat no-such-file"
   :error   #(println ((:read-error %1)) )
@@ -56,7 +75,7 @@ Errors (exit codes != 0)
 ;=> cat: no-such-file: No such file or directory
 ```
 
-Timeout
+timeout
 ```clojure
 (clj-spawner.core/exec-with-callbacks "sleep 20"
   :timeout 1
