@@ -34,5 +34,4 @@
           (success process#)
           (error   process#))
         (catch Exception e# 
-          (error (merge process# {:exception e# :kill ((:kill process#))}))))
-      process#)))
+          (error (merge process# {:exception e# :kill ((:kill process#))})))))))

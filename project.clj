@@ -1,4 +1,4 @@
-(defproject clj-spawner "0.0.1"
+(defproject clj-spawner "0.0.2"
   :description "Shell / sh utilities"
   :url "https://github.com/kontera-technologies/clj-spawner"
   :license {:name "DO-WTF-U-WANT-2"
